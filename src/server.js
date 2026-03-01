@@ -1,11 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 
 import routes from './routes/index.js';
 import { errorHandler } from './middlewares/index.js';
-
-dotenv.config();
+import { env } from './config/env.js';
 
 const app = express();
 
@@ -21,5 +19,4 @@ app.get('/', (req, res) => res.send('API is running'));
 // error middleware should be last
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));

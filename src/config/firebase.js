@@ -1,7 +1,5 @@
 import admin from 'firebase-admin';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { env } from './env.js';
 
 /**
  * The FIREBASE_SERVICE_ACCOUNT environment variable should contain a JSON-stringified
@@ -10,7 +8,7 @@ dotenv.config();
  */
 let serviceAccount;
 try {
-  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+  serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
 } catch (err) {
   console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT:', err.message);
   process.exit(1);
