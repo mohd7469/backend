@@ -4,6 +4,7 @@ import {
   getUserByEmail,
   updateUser,
 } from './userService.js';
+import { env } from '../config/env.js';
 
 const SALT_ROUNDS = 10;
 
@@ -49,8 +50,8 @@ export const getUserByRefreshToken = async (token) => {
 // helpers for OTP / token flows
 // ------------------------------------------------------------------
 
-const LINK_AND_OTP_EXPIRY_MINUTES = parseInt(process.env.LINK_AND_OTP_EXPIRY_MINUTES, 10) || 10;
-const OTP_TTL = LINK_AND_OTP_EXPIRY_MINUTES * 60 * 1000; // minutes -> ms
+const time = parseInt(env.LINK_AND_OTP_EXPIRY_MINUTES, 10);
+const OTP_TTL = time * 60 * 1000; // minutes -> ms
 
 function makeOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
