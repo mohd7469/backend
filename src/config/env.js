@@ -12,18 +12,29 @@ export const env = {
   APP_NAME: process.env.APP_NAME,
   APP_ENV: process.env.APP_ENV || 'demo',
   PORT: process.env.PORT || 5000,
-  
+
+  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'default_access_secret',
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'default_refresh_secret',
+  JWT_ACCESS_EXPIRE_IN: process.env.JWT_ACCESS_EXPIRE_IN || '15m',
+  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '1d',
+
+  ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || 'vOVH6sdmpNWjRRIqCc7rdxs01lwBzfrY', // Must be 32 chars
+  ENCRYPTION_IV: process.env.ENCRYPTION_IV || 'e977014697305d26', // Must be 16 chars
   FIREBASE_SERVICE_ACCOUNT_PATH: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
   FIREBASE_SERVICE_ACCOUNT_JSON: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
-  JWT_SECRET: process.env.JWT_SECRET,
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-  JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '15m',
-  JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '1d',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID, // Fallback if needed
+  CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(url => url.trim()) : null,
+  EMAIL_AUTH_EXPIRY_MINUTES: parseInt(process.env.EMAIL_AUTH_EXPIRY_MINUTES) || 5,
+  EMAIL_SERVICE: process.env.EMAIL_SERVICE,
+  EMAIL_HOST: process.env.EMAIL_HOST,
+  EMAIL_PORT: process.env.EMAIL_PORT,
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASS: process.env.EMAIL_PASS,
+  FRONTEND_URL: process.env.FRONTEND_URL
 };
 
 // Validate required environment variables
-const requiredEnvVars = ['JWT_SECRET', 'JWT_REFRESH_SECRET'];
+const requiredEnvVars = ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'];
 for (const envVar of requiredEnvVars) {
   if (!env[envVar]) {
     throw new Error(`Missing required environment variable: ${envVar}`);
