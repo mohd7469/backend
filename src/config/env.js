@@ -20,10 +20,12 @@ export const env = {
 
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || 'vOVH6sdmpNWjRRIqCc7rdxs01lwBzfrY', // Must be 32 chars
   ENCRYPTION_IV: process.env.ENCRYPTION_IV || 'e977014697305d26', // Must be 16 chars
+
   FIREBASE_SERVICE_ACCOUNT_PATH: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
   FIREBASE_SERVICE_ACCOUNT_JSON: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
-  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID, // Fallback if needed
+  
   CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(url => url.trim()) : null,
+  
   LINK_AND_OTP_EXPIRY_MINUTES: parseInt(process.env.LINK_AND_OTP_EXPIRY_MINUTES) || 3,
   EMAIL_SERVICE: process.env.EMAIL_SERVICE,
   EMAIL_HOST: process.env.EMAIL_HOST,
