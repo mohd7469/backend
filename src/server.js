@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
-import routes from './routes/index.js';
+import routes_v1 from './routes/v1/index.js';
 import { errorHandler } from './middlewares/index.js';
 import { env } from './config/env.js';
 
@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 // main entrance
-app.use('/api/v1', routes);
+app.use('/api/v1', routes_v1);
 
 // catch all
 app.get('/', (req, res) => res.send('API is running'));
