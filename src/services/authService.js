@@ -50,7 +50,7 @@ export const getUserByRefreshToken = async (token) => {
 // helpers for OTP / token flows
 // ------------------------------------------------------------------
 
-const time = parseInt(env.LINK_AND_OTP_EXPIRY_MINUTES, 10);
+const time = env.LINK_AND_OTP_EXPIRY_MINUTES;
 const OTP_TTL = time * 60 * 1000; // minutes -> ms
 
 function makeOtp() {
