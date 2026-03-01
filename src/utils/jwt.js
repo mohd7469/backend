@@ -4,7 +4,7 @@ import { env } from '../config/env.js';
 const accessSecret = env.JWT_ACCESS_SECRET;
 const refreshSecret = env.JWT_REFRESH_SECRET;
 const accessExpiration = env.JWT_ACCESS_EXPIRE_IN;
-const refreshExpiration = env.JWT_REFRESH_EXPIRES_IN;
+const refreshExpiration = env.JWT_REFRESH_EXPIRE_IN;
 
 if (!accessSecret || !refreshSecret) {
   throw new Error('JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be defined in environment');
