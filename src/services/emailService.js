@@ -8,7 +8,9 @@
 // import nodemailer from 'nodemailer';
 // const transporter = nodemailer.createTransport({ ... });
 
-const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@example.com';
+import { env } from '../config/env.js';
+
+const EMAIL_FROM = env.EMAIL_FROM || 'noreply@example.com';
 
 /**
  * Send verification OTP email
@@ -34,8 +36,8 @@ export const sendVerificationOtpEmail = async (email, otp) => {
  * @param {string} otp - one-time password
  */
 export const sendPasswordResetLink = async (email, token) => {
-  const BASE = process.env.PASSWORD_RESET_URL_BASE || process.env.FRONTEND_URL || 'http://localhost:3000';
-  const expiryMinutes = parseInt(process.env.LINK_AND_OTP_EXPIRY_MINUTES, 10) || 3;
+  const BASE = env.FRONTEND_URL;
+  const expiryMinutes = env.LINK_AND_OTP_EXPIRY_MINUTES;
   const link = `${BASE.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
   const subject = 'Password Reset Link';
   const html = `
