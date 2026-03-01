@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import morgan from 'morgan';
 
 import routes_v1 from './routes/v1/index.js';
 import { errorHandler } from './middlewares/index.js';
@@ -13,6 +14,9 @@ app.use(helmet());
 
 app.use(cors());
 app.use(express.json());
+
+// server logger
+app.use(morgan('dev'));
 
 // main entrance
 app.use('/api/v1', routes_v1);
