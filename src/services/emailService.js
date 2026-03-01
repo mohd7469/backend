@@ -8,9 +8,34 @@
 // import nodemailer from 'nodemailer';
 // const transporter = nodemailer.createTransport({ ... });
 
+import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 
 const EMAIL_FROM = env.EMAIL_FROM || 'noreply@example.com';
+
+// Create transporter if SMTP config is present. Falls back to console logging when not configured.
+let transporter = null;
+const createTransporter = () => {
+  try {
+    const options = {
+      host: env.EMAIL_HOST,
+      // service: process.env.SERVICE, //comment this line if you use custom server/domain
+      port: Number(env.EMAIL_PORT),
+      secure: (env.EMAIL_SECURE === 'true') || Number(env.EMAIL_PORT) === 465,
+      auth: {
+        user: env.EMAIL_USER,
+        pass: env.EMAIL_PASS,
+      },
+    };
+
+    return nodemailer.createTransport(options);
+  } catch (err) {
+    console.error('❌ [EMAIL TRANSPORT ERROR]', err);
+    return null;
+  }
+};
+
+transporter = createTransporter();
 
 /**
  * Send verification OTP email
@@ -74,25 +99,27 @@ export const sendWelcomeEmail = async (email, name) => {
  * @param {string} html - email body (HTML)
  */
 const sendEmail = async (to, subject, html) => {
-  try {
-    // TODO: Replace with actual email provider (nodemailer, SendGrid, etc.)
-    // Example using nodemailer:
-    // const info = await transporter.sendMail({
-    //   from: EMAIL_FROM,
-    //   to,
-    //   subject,
-    //   html
-    // });
-    // return info;
-
-    // For now, log to console
-    console.log(`📧 [EMAIL] To: ${to}`);
-    console.log(`📧 [EMAIL] Subject: ${subject}`);
-    console.log(`📧 [EMAIL] Body:\n${html}\n`);
-
+  // If transporter is not configured, fallback to console logging
+  if (!transporter) {
+    console.log(`📧 [EMAIL - fallback] From: ${EMAIL_FROM}`);
+    console.log(`📧 [EMAIL - fallback] To: ${to}`);
+    console.log(`📧 [EMAIL - fallback] Subject: ${subject}`);
+    console.log(`📧 [EMAIL - fallback] Body:\n${html}\n`);
     return { success: true, messageId: `mock-${Date.now()}` };
+  }
+
+  try {
+    const info = await transporter.sendMail({
+      from: EMAIL_FROM,
+      to,
+      subject,
+      html,
+    });
+
+    return { success: true, messageId: info.messageId || info.response, raw: info };
   } catch (err) {
     console.error('❌ [EMAIL ERROR]', err);
+    // rethrow so callers may handle failures
     throw err;
   }
 };
