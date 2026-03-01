@@ -1,4 +1,6 @@
-import { registerUser, validateCredentials, saveRefreshToken, getUserByRefreshToken } from '../services/authService.js';
+import { registerUser, validateCredentials, saveRefreshToken, getUserByRefreshToken,
+  generateEmailOtp, validateEmailOtp, generatePasswordResetToken } from '../services/authService.js';
+import { sendVerificationOtpEmail, sendPasswordResetLink, sendWelcomeEmail } from '../services/emailService.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/index.js';
 import { ErrorResponse } from '../utils/index.js';
 
@@ -6,6 +8,8 @@ export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
     const user = await registerUser({ name, email, password });
+    // Send welcome email
+    sendWelcomeEmail(email, name).catch(console.error);
     res.status(201).json({ success: true, data: { id: user.id, email: user.email } });
   } catch (err) {
     next(err);
@@ -49,6 +53,61 @@ export const refreshToken = async (req, res, next) => {
     const payload = { id: user.id, role: user.role };
     const accessToken = generateAccessToken(payload);
     res.json({ success: true, accessToken });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ------------------------------------------------------------------
+// new endpoints for OTP and password recovery
+// ------------------------------------------------------------------
+
+export const sendVerificationOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const otp = await generateEmailOtp(email);
+    // Send OTP via email
+    await sendVerificationOtpEmail(email, otp);
+    res.json({ success: true, message: 'Verification OTP sent to email' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const verifyEmailOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    const ok = await validateEmailOtp(email, otp);
+    if (!ok) {
+      return next(new ErrorResponse('Invalid or expired OTP', 400));
+    }
+    res.json({ success: true, message: 'Email verified' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const token = await generatePasswordResetToken(email);
+    // Send reset link via email (uses FRONTEND_URL as base)
+    await sendPasswordResetLink(email, token);
+    res.json({ success: true, message: 'Password reset link sent to email' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// endpoint for consuming reset link
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, token, newPassword } = req.body;
+    const ok = await resetPasswordWithToken(email, token, newPassword);
+    if (!ok) {
+      return next(new ErrorResponse('Invalid or expired reset token', 400));
+    }
+    res.json({ success: true, message: 'Password has been reset' });
   } catch (err) {
     next(err);
   }

@@ -24,7 +24,7 @@ export const env = {
   FIREBASE_SERVICE_ACCOUNT_JSON: process.env.FIREBASE_SERVICE_ACCOUNT_JSON,
   FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID, // Fallback if needed
   CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(url => url.trim()) : null,
-  EMAIL_AUTH_EXPIRY_MINUTES: parseInt(process.env.EMAIL_AUTH_EXPIRY_MINUTES) || 5,
+  LINK_AND_OTP_EXPIRY_MINUTES: parseInt(process.env.LINK_AND_OTP_EXPIRY_MINUTES) || 3,
   EMAIL_SERVICE: process.env.EMAIL_SERVICE,
   EMAIL_HOST: process.env.EMAIL_HOST,
   EMAIL_PORT: process.env.EMAIL_PORT,
