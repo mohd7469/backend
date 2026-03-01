@@ -128,6 +128,44 @@ export const sendWelcomeEmail = async (email, name) => {
   return sendEmail(email, subject, html);
 };
 
+export const sendPasswordChangedSuccess = async (email, name) => {
+  const subject = `${env.APP_NAME} Password Changed Successfully`;
+  const html = `
+    <div style="max-width: 450px; margin: 20px auto; padding: 32px; border: 1px solid #e4e4e7; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #ffffff; color: #09090b;">
+        <div style="margin-bottom: 24px;">
+            <h2 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.025em; color: #09090b;">
+                Password changed
+            </h2>
+            <p style="margin: 8px 0 0; font-size: 15px; color: #71717a; line-height: 1.5;">
+                Hi ${name}, your password has been changed successfully. If you didn't make this change, please secure your account immediately.
+            </p>
+        </div>
+
+        <div style="padding: 16px; background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; margin-bottom: 24px;">
+            <p style="margin: 0; font-size: 13px; color: #15803d; line-height: 1.5;">
+                <strong>✓ Success:</strong> Your account password has been updated successfully.
+            </p>
+        </div>
+
+        <div style="padding: 16px; background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; margin-bottom: 24px;">
+            <p style="margin: 0; font-size: 13px; color: #991b1b; line-height: 1.5;">
+                <strong>Important:</strong> If you did not make this change, please contact our support team immediately.
+            </p>
+        </div>
+
+        <div style="height: 1px; background-color: #e4e4e7; margin-bottom: 24px;"></div>
+
+        <div style="text-align: center;">
+            <p style="margin: 0; font-size: 12px; color: #a1a1aa;">
+                &copy; 2026 ${env.APP_NAME} Automation.
+            </p>
+        </div>
+    </div>
+  `;
+
+  return sendEmail(email, subject, html);
+};
+
 const sendEmail = async (to, subject, html) => {
   // If transporter is not configured, fallback to console logging
   if (!transporter) {
@@ -158,5 +196,6 @@ export default {
   sendVerificationOtpEmail,
   sendPasswordResetLink,
   sendWelcomeEmail,
+  sendPasswordChangedSuccess,
   sendEmail,
 };
