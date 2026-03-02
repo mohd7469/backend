@@ -1,3 +1,17 @@
+// Example of how to use the error utilities in your controllers or services:
+
+// throw errors.badRequest('Password too weak', { minLength: 8, received: 5 });
+// throw errors.notFound('User not found', { userId: 123 });
+// throw errors.conflict('Email already registered', { email: 'user@example.com' });
+// throw errors.unprocessable('Invalid request', { 
+//   errors: [
+//     { field: 'age', message: 'must be a number' },
+//     { field: 'phone', message: 'must be 10 digits' }
+//   ]
+// });
+// throw errors.serverError('Database connection failed', { errorCode: 'ECONNREFUSED' });
+
+
 const ErrorResponse = (message, statusCode, details = null) => {
   const error = new Error(message);
   error.statusCode = statusCode;
@@ -18,8 +32,7 @@ export const errors = {
   serverError: (message = 'Internal Server Error', details = null) => ErrorResponse(message, 500, details),
 };
 
-
-// centralized middleware for formatting and sending errors
+// Centralized middleware for formatting and sending errors
 export const errorHandler = (err, req, res, next) => {
   // default status
   const statusCode = err.statusCode || 500;
