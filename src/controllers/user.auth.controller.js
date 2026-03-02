@@ -11,7 +11,7 @@ import {
   resetPasswordWithToken,
 } from '../services/user.auth.service.js';
 import { getUserById } from '../services/user.data.service.js';
-import { sendVerificationOtpEmail, sendPasswordResetLink, sendWelcomeEmail } from '../services/emailService.js';
+import { sendVerificationOtpEmail, sendPasswordResetLink, sendWelcomeEmail } from '../services/email.service.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/index.js';
 import { ErrorResponse } from '../utils/index.js';
 

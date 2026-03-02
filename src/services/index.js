@@ -1,4 +1,4 @@
 export * from './user.data.service.js';
 export * from './user.auth.service.js';
 export * from './admin.auth.service.js';
-export * from './emailService.js';
+export * from './email.service.js';
