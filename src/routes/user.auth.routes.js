@@ -2,17 +2,21 @@ import express from 'express';
 import {
   register,
   login,
-  refreshToken,
+  logout,
   sendVerificationOtp,
   verifyEmailOtp,
   forgotPassword,
   resetPassword,
-} from '../controllers/index.js';
-import { validateRequiredFields } from '../../middlewares/index.js';
+  resendOtp,
+  refreshToken,
+  getProfile,
+} from '../controllers/user.auth.controller.js';
+import { validateRequiredFields } from '../middlewares/index.js';
+import { authenticateUser } from '../middlewares/user.auth.middleware.js';
 
 const router = express.Router();
 
-// user registration/login flows
+// registration & auth
 router.post(
   '/register',
   validateRequiredFields('name', 'email', 'password'),
@@ -23,8 +27,10 @@ router.post(
   validateRequiredFields('email', 'password'),
   login
 );
+router.post('/logout', authenticateUser, logout);
+router.get('/me', authenticateUser, getProfile);
 
-// email verification (two steps: generate & validate OTP)
+// email verification
 router.post(
   '/verify-email/generate',
   validateRequiredFields('email'),
@@ -35,29 +41,23 @@ router.post(
   validateRequiredFields('email', 'otp'),
   verifyEmailOtp
 );
+router.post('/resend-otp', validateRequiredFields('email'), resendOtp);
 
-// password recovery (initiate)
+// password flow
 router.post(
   '/forgot-password',
   validateRequiredFields('email'),
   forgotPassword
 );
-// password recovery (finish)
 router.post(
   '/reset-password',
   validateRequiredFields('email', 'token', 'newPassword'),
   resetPassword
 );
 
-// token refresh (both old and new endpoints)
+// token refresh
 router.post(
   '/refresh-token',
-  validateRequiredFields('token'),
-  refreshToken
-);
-// keep legacy path for now
-router.post(
-  '/refresh',
   validateRequiredFields('token'),
   refreshToken
 );

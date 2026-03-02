@@ -3,17 +3,16 @@ import {
   createUser as createUserRecord,
   getUserByEmail,
   updateUser,
-} from './userService.js';
+} from './user.data.service.js';
 import { env } from '../config/env.js';
+import { errors } from '../utils/index.js';
 
 const SALT_ROUNDS = 10;
 
 export const registerUser = async ({ name, email, password, role = 'user' }) => {
   const existing = await getUserByEmail(email);
   if (existing) {
-    const err = new Error('Email already in use');
-    err.statusCode = 400;
-    throw err;
+    throw errors.badRequest('Email already in use');
   }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
@@ -29,6 +28,10 @@ export const validateCredentials = async (email, password) => {
 
 export const saveRefreshToken = async (userId, token) => {
   await updateUser(userId, { refreshToken: token });
+};
+
+export const clearRefreshToken = async (userId) => {
+  await updateUser(userId, { refreshToken: null });
 };
 
 import { db } from '../config/firebase.js';
@@ -62,15 +65,18 @@ function makeOtp() {
 export const generateEmailOtp = async (email) => {
   const user = await getUserByEmail(email);
   if (!user) {
-    const err = new Error('User not found');
-    err.statusCode = 404;
-    throw err;
+    throw errors.notFound('User not found');
   }
   const otp = makeOtp();
   const hashed = await bcrypt.hash(otp, SALT_ROUNDS);
   const expires = Date.now() + OTP_TTL;
   await updateUser(user.id, { emailOtp: hashed, emailOtpExpires: expires });
   return otp;
+};
+
+// secondary alias for generating email OTP again
+export const resendOtp = async (email) => {
+  return generateEmailOtp(email);
 };
 
 export const validateEmailOtp = async (email, otp) => {
@@ -87,9 +93,7 @@ export const validateEmailOtp = async (email, otp) => {
 export const generatePasswordResetToken = async (email) => {
   const user = await getUserByEmail(email);
   if (!user) {
-    const err = new Error('User not found');
-    err.statusCode = 404;
-    throw err;
+    throw errors.notFound('User not found');
   }
   // generate a random token and store a hashed version
   const token = crypto.randomBytes(32).toString('hex');

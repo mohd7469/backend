@@ -1,8 +1,19 @@
-import { registerUser, validateCredentials, saveRefreshToken, getUserByRefreshToken,
-  generateEmailOtp, validateEmailOtp, generatePasswordResetToken } from '../services/authService.js';
-import { sendVerificationOtpEmail, sendPasswordResetLink, sendWelcomeEmail } from '../services/emailService.js';
+import {
+  registerUser,
+  validateCredentials,
+  saveRefreshToken,
+  clearRefreshToken,
+  getUserByRefreshToken,
+  generateEmailOtp,
+  resendOtp as resendOtpService,
+  validateEmailOtp,
+  generatePasswordResetToken,
+  resetPasswordWithToken,
+} from '../services/user.auth.service.js';
+import { getUserById } from '../services/user.data.service.js';
+import { sendVerificationOtpEmail, sendPasswordResetLink, sendWelcomeEmail } from '../services/email.service.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/index.js';
-import { ErrorResponse } from '../utils/index.js';
+import { errors } from '../utils/index.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -21,7 +32,7 @@ export const login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await validateCredentials(email, password);
     if (!user) {
-      return next(new ErrorResponse('Invalid credentials', 401));
+      return next(errors.unauthorized('Invalid credentials'));
     }
     const payload = { id: user.id, role: user.role };
     const accessToken = generateAccessToken(payload);
@@ -37,18 +48,18 @@ export const refreshToken = async (req, res, next) => {
   try {
     const { token } = req.body;
     if (!token) {
-      return next(new ErrorResponse('Refresh token required', 400));
+      return next(errors.badRequest('Refresh token required'));
     }
     // verify cryptographic validity
     try {
       verifyRefreshToken(token);
     } catch (err) {
-      return next(new ErrorResponse('Invalid refresh token', 401));
+      return next(errors.unauthorized('Invalid refresh token'));
     }
     // make sure it's one we issued
     const user = await getUserByRefreshToken(token);
     if (!user) {
-      return next(new ErrorResponse('Refresh token not recognized', 401));
+      return next(errors.unauthorized('Refresh token not recognized'));
     }
     const payload = { id: user.id, role: user.role };
     const accessToken = generateAccessToken(payload);
@@ -79,9 +90,20 @@ export const verifyEmailOtp = async (req, res, next) => {
     const { email, otp } = req.body;
     const ok = await validateEmailOtp(email, otp);
     if (!ok) {
-      return next(new ErrorResponse('Invalid or expired OTP', 400));
+      return next(errors.badRequest('Invalid or expired OTP'));
     }
     res.json({ success: true, message: 'Email verified' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resendOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const otp = await resendOtpService(email);
+    await sendVerificationOtpEmail(email, otp);
+    res.json({ success: true, message: 'OTP resent to email' });
   } catch (err) {
     next(err);
   }
@@ -99,16 +121,37 @@ export const forgotPassword = async (req, res, next) => {
   }
 };
 
-// endpoint for consuming reset link
 export const resetPassword = async (req, res, next) => {
   try {
     const { email, token, newPassword } = req.body;
     const ok = await resetPasswordWithToken(email, token, newPassword);
     if (!ok) {
-      return next(new ErrorResponse('Invalid or expired reset token', 400));
+      return next(errors.badRequest('Invalid or expired reset token'));
     }
     res.json({ success: true, message: 'Password has been reset' });
   } catch (err) {
     next(err);
   }
 };
+
+export const logout = async (req, res, next) => {
+  try {
+    await clearRefreshToken(req.user.id);
+    res.json({ success: true, message: 'Logged out' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const user = await getUserById(req.user.id);
+    if (!user) {
+      return next(errors.notFound('User not found'));
+    }
+    res.json({ success: true, data: user });
+  } catch (err) {
+    next(err);
+  }
+};
+

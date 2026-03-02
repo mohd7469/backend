@@ -32,7 +32,9 @@ export const env = {
   EMAIL_PORT: process.env.EMAIL_PORT,
   EMAIL_USER: process.env.EMAIL_USER,
   EMAIL_PASS: process.env.EMAIL_PASS,
-  FRONTEND_URL: process.env.FRONTEND_URL
+  
+  FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN,
+  ADMIN_ORIGIN: process.env.ADMIN_ORIGIN
 };
 
 // Validate required environment variables

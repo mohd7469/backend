@@ -1,2 +1,3 @@
-export * from './authController.js';
-export * from './userController.js';
+export * from './user.auth.controller.js';
+export * from './user.profile.controller.js';
+export * from './admin.auth.controller.js';
