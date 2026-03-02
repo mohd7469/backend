@@ -25,9 +25,9 @@ app.use('/api/v1', routes);
 app.get('/', (req, res) => res.send('API server is running..'));
 
 // handle undefined routes (404)
-app.use('*', (req, res, next) => next(errors.notFound(`Route ${req.originalUrl} not found`)));
+app.use('*', (req, res, next) => next(errors.notFound(`Route "${req.originalUrl}" not found`)));
 
 // error middleware should be last
 app.use(errorHandler);
 
-app.listen(env.PORT, () => console.log(`Server running on port ${env.PORT}`));
+app.listen(env.PORT, () => console.log(`\nenv: ${env.APP_ENV}\nserver running on port ${env.PORT}\n`));
