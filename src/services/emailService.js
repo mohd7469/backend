@@ -84,7 +84,7 @@ export const sendVerificationOtpEmail = async (email, otp) => {
 };
 
 export const sendPasswordResetLink = async (email, token) => {
-  const BASE = env.FRONTEND_URL;
+  const BASE = env.FRONTEND_ORIGIN;
   const expiryMinutes = env.LINK_AND_OTP_EXPIRY_MINUTES;
   const link = `${BASE.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
   const subject = `${env.APP_NAME} Password Reset`;
