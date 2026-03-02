@@ -22,7 +22,10 @@ app.use(morgan('dev'));
 app.use('/api/v1', routes);
 
 // catch all
-app.get('/', (req, res) => res.send('API is running'));
+app.get('/', (req, res) => res.send('API server is running..'));
+
+// handle undefined routes (404)
+app.use('*', (req, res, next) => next(errors.notFound(`Route ${req.originalUrl} not found`)));
 
 // error middleware should be last
 app.use(errorHandler);
