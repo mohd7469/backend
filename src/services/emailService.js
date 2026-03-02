@@ -36,6 +36,14 @@ const createTransporter = () => {
 
 transporter = createTransporter();
 
+// verify connection configuration (useful for debugging during startup)
+if (transporter) {
+  transporter
+    .verify()
+    .then(() => console.log('Connected to email server'))
+    .catch(() => console.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
+}
+
 export const sendVerificationOtpEmail = async (email, otp) => {
   const subject = `${env.APP_NAME} Verification ${otp}`;
   const html = `
