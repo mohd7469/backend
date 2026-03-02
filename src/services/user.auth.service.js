@@ -5,15 +5,14 @@ import {
   updateUser,
 } from './user.data.service.js';
 import { env } from '../config/env.js';
+import { errors } from '../utils/index.js';
 
 const SALT_ROUNDS = 10;
 
 export const registerUser = async ({ name, email, password, role = 'user' }) => {
   const existing = await getUserByEmail(email);
   if (existing) {
-    const err = new Error('Email already in use');
-    err.statusCode = 400;
-    throw err;
+    throw errors.badRequest('Email already in use');
   }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
@@ -66,9 +65,7 @@ function makeOtp() {
 export const generateEmailOtp = async (email) => {
   const user = await getUserByEmail(email);
   if (!user) {
-    const err = new Error('User not found');
-    err.statusCode = 404;
-    throw err;
+    throw errors.notFound('User not found');
   }
   const otp = makeOtp();
   const hashed = await bcrypt.hash(otp, SALT_ROUNDS);
@@ -96,9 +93,7 @@ export const validateEmailOtp = async (email, otp) => {
 export const generatePasswordResetToken = async (email) => {
   const user = await getUserByEmail(email);
   if (!user) {
-    const err = new Error('User not found');
-    err.statusCode = 404;
-    throw err;
+    throw errors.notFound('User not found');
   }
   // generate a random token and store a hashed version
   const token = crypto.randomBytes(32).toString('hex');

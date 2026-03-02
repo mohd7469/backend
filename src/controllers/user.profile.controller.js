@@ -3,14 +3,14 @@ import {
   updateUser as updateUserService,
   deleteUser as deleteUserService,
 } from '../services/user.data.service.js';
-import { ErrorResponse } from '../utils/index.js';
+import { errors } from '../utils/index.js';
 
 // profile endpoints for authenticated user
 export const getProfile = async (req, res, next) => {
   try {
     const user = await getUserById(req.user.id);
     if (!user) {
-      return next(new ErrorResponse('User not found', 404));
+      return next(errors.notFound('User not found'));
     }
     res.json({ success: true, data: user });
   } catch (err) {
