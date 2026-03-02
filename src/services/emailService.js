@@ -37,12 +37,13 @@ const createTransporter = () => {
 transporter = createTransporter();
 
 // verify connection configuration (useful for debugging during startup)
-if (transporter) {
-  transporter
-    .verify()
-    .then(() => console.log('Connected to email server'))
-    .catch(() => console.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
-}
+transporter
+  .verify()
+  .then(() => console.log('Connected to email server'))
+  .catch((err) => {
+    console.error('❌ Unable to connect to email server. Make sure you have configured SMTP options in .env');
+    process.exit(1);
+  });
 
 export const sendVerificationOtpEmail = async (email, otp) => {
   const subject = `${env.APP_NAME} Verification ${otp}`;
@@ -175,14 +176,6 @@ export const sendPasswordChangedSuccess = async (email, name) => {
 };
 
 const sendEmail = async (to, subject, html) => {
-  // If transporter is not configured, fallback to console logging
-  if (!transporter) {
-    console.log(`📧 [EMAIL - fallback] From: ${EMAIL_FROM}`);
-    console.log(`📧 [EMAIL - fallback] To: ${to}`);
-    console.log(`📧 [EMAIL - fallback] Subject: ${subject}`);
-    console.log(`📧 [EMAIL - fallback] Body:\n${html}\n`);
-    return { success: true, messageId: `mock-${Date.now()}` };
-  }
 
   try {
     const info = await transporter.sendMail({
