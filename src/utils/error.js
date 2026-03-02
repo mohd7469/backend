@@ -1,6 +1,7 @@
-const ErrorResponse = (message, statusCode) => {
+const ErrorResponse = (message, statusCode, details = null) => {
   const error = new Error(message);
   error.statusCode = statusCode;
+  error.details = details;
   error.name = 'ErrorResponse';
   Error.captureStackTrace(error, ErrorResponse);
   return error;
@@ -8,13 +9,13 @@ const ErrorResponse = (message, statusCode) => {
 
 // Common HTTP error helpers for consistent error responses
 export const errors = {
-  badRequest: (message = 'Bad Request') => ErrorResponse(message, 400),
-  unauthorized: (message = 'Unauthorized') => ErrorResponse(message, 401),
-  forbidden: (message = 'Forbidden') => ErrorResponse(message, 403),
-  notFound: (message = 'Not Found') => ErrorResponse(message, 404),
-  conflict: (message = 'Conflict') => ErrorResponse(message, 409),
-  unprocessable: (message = 'Unprocessable Entity') => ErrorResponse(message, 422),
-  serverError: (message = 'Internal Server Error') => ErrorResponse(message, 500),
+  badRequest: (message = 'Bad Request', details = null) => ErrorResponse(message, 400, details),
+  unauthorized: (message = 'Unauthorized', details = null) => ErrorResponse(message, 401, details),
+  forbidden: (message = 'Forbidden', details = null) => ErrorResponse(message, 403, details),
+  notFound: (message = 'Not Found', details = null) => ErrorResponse(message, 404, details),
+  conflict: (message = 'Conflict', details = null) => ErrorResponse(message, 409, details),
+  unprocessable: (message = 'Unprocessable Entity', details = null) => ErrorResponse(message, 422, details),
+  serverError: (message = 'Internal Server Error', details = null) => ErrorResponse(message, 500, details),
 };
 
 
@@ -23,12 +24,15 @@ export const errorHandler = (err, req, res, next) => {
   // default status
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
+  const details = err.details || null;
 
   console.error(`[${new Date().toISOString()}] ${err.name || 'Error'}: ${message}`);
 
   res.status(statusCode).json({
     success: false,
-    error: message,
+    statusCode,
+    message,
+    ...(details && { details }),
     ...(process.env.APP_ENV !== 'production' && { stack: err.stack }),
   });
 };
