@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-import routes_v1 from './routes/v1/index.js';
+import routes from './routes/index.js';
 import { errorHandler } from './middlewares/index.js';
 import { env } from './config/env.js';
 
@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // main entrance
-app.use('/api/v1', routes_v1);
+app.use('/api/v1', routes);
 
 // catch all
 app.get('/', (req, res) => res.send('API is running'));

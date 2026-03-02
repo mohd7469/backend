@@ -3,7 +3,7 @@ import {
   createUser as createUserRecord,
   getUserByEmail,
   updateUser,
-} from './userService.js';
+} from './user.data.service.js';
 import { env } from '../config/env.js';
 
 const SALT_ROUNDS = 10;
@@ -29,6 +29,10 @@ export const validateCredentials = async (email, password) => {
 
 export const saveRefreshToken = async (userId, token) => {
   await updateUser(userId, { refreshToken: token });
+};
+
+export const clearRefreshToken = async (userId) => {
+  await updateUser(userId, { refreshToken: null });
 };
 
 import { db } from '../config/firebase.js';
@@ -71,6 +75,11 @@ export const generateEmailOtp = async (email) => {
   const expires = Date.now() + OTP_TTL;
   await updateUser(user.id, { emailOtp: hashed, emailOtpExpires: expires });
   return otp;
+};
+
+// secondary alias for generating email OTP again
+export const resendOtp = async (email) => {
+  return generateEmailOtp(email);
 };
 
 export const validateEmailOtp = async (email, otp) => {

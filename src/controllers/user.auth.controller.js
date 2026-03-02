@@ -1,5 +1,16 @@
-import { registerUser, validateCredentials, saveRefreshToken, getUserByRefreshToken,
-  generateEmailOtp, validateEmailOtp, generatePasswordResetToken } from '../services/authService.js';
+import {
+  registerUser,
+  validateCredentials,
+  saveRefreshToken,
+  clearRefreshToken,
+  getUserByRefreshToken,
+  generateEmailOtp,
+  resendOtp as resendOtpService,
+  validateEmailOtp,
+  generatePasswordResetToken,
+  resetPasswordWithToken,
+} from '../services/user.auth.service.js';
+import { getUserById } from '../services/user.data.service.js';
 import { sendVerificationOtpEmail, sendPasswordResetLink, sendWelcomeEmail } from '../services/emailService.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/index.js';
 import { ErrorResponse } from '../utils/index.js';
@@ -87,6 +98,17 @@ export const verifyEmailOtp = async (req, res, next) => {
   }
 };
 
+export const resendOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const otp = await resendOtpService(email);
+    await sendVerificationOtpEmail(email, otp);
+    res.json({ success: true, message: 'OTP resent to email' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -99,7 +121,6 @@ export const forgotPassword = async (req, res, next) => {
   }
 };
 
-// endpoint for consuming reset link
 export const resetPassword = async (req, res, next) => {
   try {
     const { email, token, newPassword } = req.body;
@@ -112,3 +133,25 @@ export const resetPassword = async (req, res, next) => {
     next(err);
   }
 };
+
+export const logout = async (req, res, next) => {
+  try {
+    await clearRefreshToken(req.user.id);
+    res.json({ success: true, message: 'Logged out' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const user = await getUserById(req.user.id);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+    res.json({ success: true, data: user });
+  } catch (err) {
+    next(err);
+  }
+};
+
